@@ -4,9 +4,11 @@ This repository contains the development stages of the connect four twitter bot.
 
 ### Phase 1
 
-Initially I developed code to automatically process and respond to twitter mentions. This code, which interfaces with the Twitter API, was developed independently of any game board actions. This implementation, upon processing a mention, loads and stores a pre-written tweet with it's accompanying metadata to be sent. Then, in a separate process, the bot composes and sends out tweets in a FIFO manner.
+Initially I developed code to automatically process and respond to twitter mentions. 
 
-At this point in the development process, I had not allocated any VPS for this bot, so I used a glitch Flask server as a sandbox environment to test my code. 
+The tweet_reader.get_mentions() script is automatically triggered on a regular interval, and collects all mentions of the bot made available by the Twitter API since the last mention read. Upon processing each mention, the script constructs and stores a pre-written tweet with it's accompanying metadata. 
+
+Then, in a separate process, the tweet_writer.tweet() method composes and sends out tweets based on the stored information, in a FIFO manner.
 
 ### Phase 2
 
@@ -19,3 +21,9 @@ In the third phase, I adapted the phase 1 code to create, interact with, and sto
 In support of this, I wrote a group of functions to optimize the storage of game information in text files.
 
 By this point in the development process, I had realized the necessity of upgrading to a VPS, and had allocated a Ubuntu server upon which to test my code. 
+
+In the the process of setting up the VPS, I had to:
+* learn about & set up SSH authentication
+* create & configure a sudo non-root user
+* configure firewall
+* configure local programming environment
