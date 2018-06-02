@@ -22,7 +22,7 @@ def get_next_game_id():
     :return: the ID for the next new game.
     :rtype: int
     """
-    with open(os.path.join(getpath(), ".data/next_game_id.txt"), 'rw+') as f:
+    with open(os.path.join(getpath(), "data/next_game_id.txt"), 'rw+') as f:
         out = int(f.read())
         f.seek(0)
         f.write(str(out + 1))
@@ -35,7 +35,7 @@ def load_next_game_reply():
     :return: next game to be tweeted out.
     :rtype: str
     """
-    with open(os.path.join(getpath(), '.data/queue.csv'), 'a+') as f:
+    with open(os.path.join(getpath(), 'data/queue.csv'), 'a+') as f:
         last_wrote = get_last_wrote()
         for line in f:
             tokens = line.split(",")
@@ -50,7 +50,7 @@ def record_game(gamestring):
     :param gamestring: a string representation of the game to be recorded.
     :type gamestring: str
     """
-    with open(os.path.join(getpath(), '.data/gamelist.csv'), 'a+') as f:
+    with open(os.path.join(getpath(), 'data/gamelist.csv'), 'a+') as f:
         f.write(gamestring + "\n")
     log("Recorded " + gamestring)
 
@@ -63,7 +63,7 @@ def retrieve_game(last_tweet_id):
     :return: gamestring of game iff game with last_tweet_id exists, else None.
     :rtype: str, None
     """
-    with open(os.path.join(getpath(), '.data/gamelist.csv'), 'a+') as f:
+    with open(os.path.join(getpath(), 'data/gamelist.csv'), 'a+') as f:
         for line in f:
             tokens = line.split(",")
             if int(tokens[3]) == int(last_tweet_id):
@@ -77,7 +77,7 @@ def record_outgoing_game(gamestring):
     :param gamestring: a string representation of the game to be recorded.
     :type gamestring: str
     """
-    with open(os.path.join(getpath(), '.data/queue.csv'), 'a+') as f:
+    with open(os.path.join(getpath(), 'data/queue.csv'), 'a+') as f:
         f.write(gamestring + "\n")
     log("Recorded outgoing " + gamestring)
 
@@ -91,7 +91,7 @@ def retrieve_outgoing_game(last_tweet_id):
     :return: gamestring of game iff game with last_tweet_id exists, else None.
     :rtype: str, None
     """
-    with open(os.path.join(getpath(), '.data/queue.csv'), 'a+') as f:
+    with open(os.path.join(getpath(), 'data/queue.csv'), 'a+') as f:
         for line in f:
             print(line)
             tokens = line.split(",")
