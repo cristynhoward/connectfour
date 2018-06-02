@@ -1,6 +1,6 @@
-import os, tweepy
+import tweepy
 from time import gmtime, strftime
-from io.secrets import *
+from phase1.secrets import *
 
 
 def get_twitter_api():
@@ -19,7 +19,7 @@ def log(message):
     """ Log message to logfile."""
     print(message)
     day = strftime("%d_%b_%Y", gmtime())
-    with open(os.path.join(getpath(), ".data/" + day + "_bot.log"), 'a+') as f:
+    with open(os.path.join(getpath(), "data/" + day + "_bot.log"), 'a+') as f:
         t = strftime("%d %b %Y %H:%M:%S", gmtime())
         f.write("\n" + t + " " + message)
 
@@ -30,7 +30,7 @@ def get_read_since():
     :return: the ID of the last tweet read.
     :rtype: str
     """
-    with open(os.path.join(getpath(), ".data/tweetinfo.csv"), 'a+') as f:
+    with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'a+') as f:
         for line in f:
             x = line.split(",")
             return x[0]
@@ -41,7 +41,7 @@ def get_last_wrote():
     :return: the ID of the last tweet written.
     :rtype: str
     """
-    with open(os.path.join(getpath(), ".data/tweetinfo.csv"), 'a+') as f:
+    with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'a+') as f:
         for line in f:
             x = line.split(",")
             return x[1]
@@ -54,7 +54,7 @@ def set_read_since(new):
     :type new: int, str
     """
     next_write = get_last_wrote()
-    with open(os.path.join(getpath(), ".data/tweetinfo.csv"), 'w') as f:
+    with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'w') as f:
         f.write(str(new) + "," + next_write)
 
 
@@ -65,5 +65,5 @@ def set_last_wrote(new):
     :type new: int, str
     """
     read_since = get_read_since()
-    with open(os.path.join(getpath(), ".data/tweetinfo.csv"), 'w') as f:
+    with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'w') as f:
         f.write(read_since + "," + str(new))
