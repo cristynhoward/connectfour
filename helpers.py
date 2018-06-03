@@ -19,7 +19,7 @@ def log(message):
     """ Log message to logfile."""
     print(message)
     day = strftime("%d_%b_%Y", gmtime())
-    with open(os.path.join(getpath(), "data/" + day + "_bot.log"), 'a+') as f:
+    with open(os.path.join(getpath(), "data/logs/" + day + "_bot.log"), 'a+') as f:
         t = strftime("%d %b %Y %H:%M:%S", gmtime())
         f.write("\n" + t + " " + message)
 
