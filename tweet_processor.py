@@ -18,7 +18,13 @@ def process_mentions():
 
     for tweet in limit_handled(tweepy.Cursor(api.mentions_timeline).items()):
         if int(tweet.id_str) <= int(since_id):
+            if first is True:
+                log("No new mentions to process.")
+            else:
+                log("Processed mentions from " + str(since_id) + " to " + str(newest_tweet_id) + ".")
+                set_read_since(newest_tweet_id)
             return
+
         if first is True:
             newest_tweet_id = tweet.id_str
             first = False
@@ -51,9 +57,6 @@ def process_mentions():
                             record_outgoing_game(game.game_to_string())
                             log(active_user + " played a " + token +
                                 " resulting in game: " + game.game_to_string())
-
-    log("Processed mentions from " + str(since_id) + " to " + str(newest_tweet_id) + ".")
-    set_read_since(newest_tweet_id)
 
 
 if __name__ == '__main__':
