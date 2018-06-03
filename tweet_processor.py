@@ -1,5 +1,8 @@
-from phase2.ConnectFourGame import *
-from phase3.gamehelpers import *
+""" Process mentions.
+"""
+from ConnectFourGame import *
+from gamehelpers import *
+from helpers import *
 
 
 def process_mentions():

@@ -1,6 +1,7 @@
-from phase2.ConnectFourGame import *
-from phase3.gamehelpers import *
 import emoji
+from ConnectFourGame import *
+from  gamehelpers import *
+from helpers import *
 
 
 def tweet():
@@ -24,7 +25,7 @@ def tweet():
             record_game(game.game_to_string())
             log("Tweeted "+game.game_to_string())
             tweet()
-            
+
 
 if __name__ == '__main__':
     tweet()

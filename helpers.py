@@ -1,6 +1,6 @@
 import tweepy
 from time import gmtime, strftime
-from phase1.secrets import *
+from secrets import *
 
 
 def get_twitter_api():
