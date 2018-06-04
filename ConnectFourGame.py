@@ -72,7 +72,7 @@ class ConnectFourGame:
         :rtype: ConnectFourGame
         """
         boardstring = "000000000000000000000000000000000000000000"
-        game = ConnectFourGame(id, user1, user2, last_tweet, datetime.now(), boardstring, 1, 0)
+        game = ConnectFourGame(id, user1, user2, last_tweet, datetime.now(), boardstring, 0, 0)
         return game
 
     @staticmethod
@@ -125,9 +125,15 @@ class ConnectFourGame:
         :return: Tweetable representation of the board game.
         :rtype: str
         """
-        out = ""
+        out = "@"
+        if self.a_is_playing == 1:
+            out = out + self.user2
+        else:
+            out = out + self.user1
+
+        out = out + "\n"
         if self.game_won:
-            out = out + "       GAME WON"
+            out = out + "       GAME WON\n"
         out = out + "\n"
 
         for d in range(6):
@@ -148,6 +154,7 @@ class ConnectFourGame:
         out = out + "\n" + "@" + self.user2 + "   :blue_circle:"
         if self.a_is_playing != 1:
             out = out + " (next)"
+
         return out
 
     def play_turn(self, tweet_id, col):
