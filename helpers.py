@@ -1,4 +1,4 @@
-import tweepy
+import tweepy, os
 from time import gmtime, strftime
 from secrets import *
 

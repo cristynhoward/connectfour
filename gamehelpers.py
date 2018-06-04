@@ -40,7 +40,7 @@ def load_next_game_reply():
         last_wrote = get_last_wrote()
         for line in f:
             tokens = line.split(",")
-            if tokens[3] > last_wrote:
+            if int(tokens[3]) > int(last_wrote):
                 return str(line)
         return None
 
