@@ -1,15 +1,12 @@
-""" Process mentions.
+""" Module for processing mentions of the bot via the Twitter API.
 """
 from ConnectFourGame import *
-from gamehelpers import *
+from databasehelpers import *
 from helpers import *
 
 
 def process_mentions():
-    """
-
-    :return:
-    :rtype:
+    """ Scan through recent mentions and process them as appropriate.
     """
     api = get_twitter_api()
     first = True
@@ -30,21 +27,21 @@ def process_mentions():
             first = False
 
         #  NEW GAME
-        if len(tweet.entities[u'user_mentions']) > 1:  # at least one other user mentioned
-            if tweet.in_reply_to_status_id is None:  # not reply to another tweet
-                if len(tweet.text.split(" ")) > 1:  # has second command
+        if len(tweet.entities[u'user_mentions']) > 1:   # at least one other user mentioned
+            if tweet.in_reply_to_status_id is None:      # not reply to another tweet
+                if len(tweet.text.split(" ")) > 1:        # has second command
                     if tweet.text.split(" ")[1] == "new":  # second command is new
                         user1 = tweet.user.screen_name
                         user2 = tweet.entities[u'user_mentions'][1][u'screen_name']
                         newgame = ConnectFourGame.new_game(get_next_game_id(), user1, user2, tweet.id_str)
-                        record_game(newgame.game_to_string())
-                        record_outgoing_game(newgame.game_to_string())
                         log("Created new game: " + newgame.game_to_string())
+                        record_outgoing_tweet(newgame)
+
         else:
             #  PLAY TURN
-            gamestring = retrieve_game(tweet.in_reply_to_status_id)
-            if gamestring is not None:
-                game = ConnectFourGame.game_from_string(gamestring)
+            doc = get_active_game(tweet.in_reply_to_status_id)
+            if doc is not None:
+                game = ConnectFourGame.game_from_string(doc["game"])
                 if game.game_won == 0:
                     active_user = game.user2
                     if game.a_is_playing == 1:
@@ -53,10 +50,9 @@ def process_mentions():
                         token = tweet.text.split(" ")[2]
                         if any(token == s for s in ["1", "2", "3", "4", "5", "6", "7"]):
                             game.play_turn(int(tweet.id_str), int(token))
-                            record_game(game.game_to_string())
-                            record_outgoing_game(game.game_to_string())
                             log(active_user + " played a " + token +
                                 " resulting in game: " + game.game_to_string())
+                            record_outgoing_tweet(game)
 
 
 if __name__ == '__main__':
