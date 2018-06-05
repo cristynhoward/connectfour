@@ -3,34 +3,6 @@ from helpers import *
 import os
 
 
-def limit_handled(cursor):
-    """ Iterates with a cursor object, pauses for 15 min when given a RateLimitException.
-    Code taken from: http://docs.tweepy.org/en/v3.5.0/code_snippet.html#pagination
-
-    :param cursor: The cursor to be rate limited.
-    :type cursor: Cursor
-    """
-    while True:
-        try:
-            yield cursor.next()
-        except tweepy.RateLimitError:
-            sleep(15 * 60)
-
-
-def get_next_game_id():
-    """Get the ID for the next new game.
-
-    :return: the ID for the next new game.
-    :rtype: int
-    """
-    with open(os.path.join(getpath(), "data/next_game_id.txt"), 'rw+') as f:
-        out = int(f.read())
-        f.seek(0)
-        f.write(str(out + 1))
-        f.truncate()
-    return out
-
-
 def load_next_game_reply():
     """ Return next game to be tweeted out.
     :return: next game to be tweeted out.

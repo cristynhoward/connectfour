@@ -1,6 +1,9 @@
-import tweepy, os
-from time import gmtime, strftime
+""" Miscellaneous helper functions. """
+
+from time import gmtime, strftime, sleep
 from secrets import *
+import tweepy
+import os
 
 
 def get_twitter_api():
@@ -8,6 +11,20 @@ def get_twitter_api():
     auth = tweepy.OAuthHandler(C_KEY, C_SECRET)
     auth.set_access_token(A_TOKEN, A_TOKEN_SECRET)
     return tweepy.API(auth)
+
+
+def limit_handled(cursor):
+    """ Iterates with a cursor object, pauses for 15 min when given a RateLimitException.
+    Code taken from: http://docs.tweepy.org/en/v3.5.0/code_snippet.html#pagination
+
+    :param cursor: The cursor to be rate limited.
+    :type cursor: Cursor
+    """
+    while True:
+        try:
+            yield cursor.next()
+        except tweepy.RateLimitError:
+            sleep(15 * 60)
 
 
 def getpath():
@@ -22,6 +39,20 @@ def log(message):
     with open(os.path.join(getpath(), "data/logs/" + day + "_bot.log"), 'a+') as f:
         t = strftime("%d %b %Y %H:%M:%S", gmtime())
         f.write("\n" + t + " " + message)
+
+
+def get_next_game_id():
+    """Get the ID for the next new game.
+
+    :return: the ID for the next new game.
+    :rtype: int
+    """
+    with open(os.path.join(getpath(), "data/next_game_id.txt"), 'rw+') as f:
+        out = int(f.read())
+        f.seek(0)
+        f.write(str(out + 1))
+        f.truncate()
+    return out
 
 
 def get_read_since():
