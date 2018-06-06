@@ -14,45 +14,51 @@ def process_mentions():
     newest_tweet_id = None
 
     for tweet in limit_handled(tweepy.Cursor(api.mentions_timeline).items()):
-        if int(tweet.id_str) <= int(since_id):
-            if first is True:
+
+        if int(tweet.id_str) <= int(since_id):  # if tweet has already been processed...
+            if first is True:  # & we haven't seen any other tweets yet:
                 log("No new mentions to process.")
-            else:
+            else:  # we have processed other tweets, thus:
                 log("Processed mentions from " + str(since_id) + " to " + str(newest_tweet_id) + ".")
                 set_read_since(newest_tweet_id)
             return
 
-        if first is True:
+        if first is True:  # Collect ID of first tweet processed.
             newest_tweet_id = tweet.id_str
             first = False
 
-        #  NEW GAME
-        if len(tweet.entities[u'user_mentions']) > 1:   # at least one other user mentioned
-            if tweet.in_reply_to_status_id is None:      # not reply to another tweet
-                if len(tweet.text.split(" ")) > 1:        # has second command
-                    if tweet.text.split(" ")[1] == "new":  # second command is new
-                        user1 = tweet.user.screen_name
-                        user2 = tweet.entities[u'user_mentions'][1][u'screen_name']
-                        newgame = ConnectFourGame.new_game(get_next_game_id(), user1, user2, tweet.id_str)
-                        log("Created new game: " + newgame.game_to_string())
-                        record_outgoing_tweet(newgame)
+        if tweet.in_reply_to_status_id is None:       # not reply to another tweet
+            if len(tweet.entities[u'user_mentions']) > 1:  # > 1 other user mentioned
+                if tweet.text.split(" ")[1] == "new":       # secondword is 'new'
+
+                    #  NEW GAME
+                    user1 = tweet.user.screen_name
+                    user2 = tweet.entities[u'user_mentions'][1][u'screen_name']
+                    newgame = ConnectFourGame.new_game(get_next_game_id(), user1, user2, tweet.id_str)
+                    log("Created new game: " + newgame.game_to_string())
+                    record_outgoing_tweet(newgame)
 
         else:
-            #  PLAY TURN
             doc = get_active_game(tweet.in_reply_to_status_id)
-            if doc is not None:
-                game = ConnectFourGame.game_from_string(doc["game"])
-                if game.game_won == 0:
+            if doc.count() != 0:
+                game = ConnectFourGame.game_from_string(doc[0]["game"])
+
+                active_user = game.user2
+                if game.a_is_playing == 1:
                     active_user = game.user2
-                    if game.a_is_playing == 1:
-                        active_user = game.user1
-                    if tweet.user.screen_name == active_user:
-                        token = tweet.text.split(" ")[2]
-                        if any(token == s for s in ["1", "2", "3", "4", "5", "6", "7"]):
-                            game.play_turn(int(tweet.id_str), int(token))
-                            log(active_user + " played a " + token +
-                                " resulting in game: " + game.game_to_string())
-                            record_outgoing_tweet(game)
+                token = 2
+                if game.user1 == game.user2:
+                    token = 1
+
+                if (tweet.user.screen_name == active_user) & (game.game_won == 0):
+                    column_played = tweet.text.split(" ")[token]
+                    if any(column_played == s for s in ["1", "2", "3", "4", "5", "6", "7"]):
+
+                        #  PLAY TURN
+                        game.play_turn(int(tweet.id_str), int(column_played))
+                        log(active_user + " played a " + column_played +
+                            " resulting in game: " + game.game_to_string())
+                        record_outgoing_tweet(game)
 
 
 if __name__ == '__main__':
