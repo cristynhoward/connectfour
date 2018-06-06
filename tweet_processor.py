@@ -14,7 +14,6 @@ def process_mentions():
     newest_tweet_id = None
 
     for tweet in limit_handled(tweepy.Cursor(api.mentions_timeline).items()):
-
         if int(tweet.id_str) <= int(since_id):  # if tweet has already been processed...
             if first is True:  # & we haven't seen any other tweets yet:
                 log("No new mentions to process.")
@@ -39,9 +38,9 @@ def process_mentions():
                     record_outgoing_tweet(newgame)
 
         else:
-            doc = get_active_game(tweet.in_reply_to_status_id)
-            if doc.count() != 0:
-                game = ConnectFourGame.game_from_string(doc[0]["game"])
+            doc = get_active_game(str(tweet.in_reply_to_status_id))
+            if doc is not None:
+                game = ConnectFourGame.game_from_string(doc["game"])
 
                 active_user = game.user2
                 if game.a_is_playing == 1:

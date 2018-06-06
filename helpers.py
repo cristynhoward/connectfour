@@ -47,8 +47,10 @@ def get_next_game_id():
     :return: the ID for the next new game.
     :rtype: int
     """
-    with open(os.path.join(getpath(), "data/next_game_id.txt"), 'rw+') as f:
+    out = 0
+    with open(os.path.join(getpath(), "data/next_game_id.txt"), 'r') as f:
         out = int(f.read())
+    with open(os.path.join(getpath(), "data/next_game_id.txt"), 'w') as f:
         f.seek(0)
         f.write(str(out + 1))
         f.truncate()
@@ -61,9 +63,13 @@ def get_read_since():
     :return: the ID of the last tweet read.
     :rtype: str
     """
-    with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'a+') as f:
+    print("getting read since")
+    with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'r') as f:
+        print("opened file")
         for line in f:
+            print(str(line))
             x = line.split(",")
+            print(str(x[0]))
             return x[0]
 
 
@@ -72,7 +78,7 @@ def get_last_wrote():
     :return: the ID of the last tweet written.
     :rtype: str
     """
-    with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'a+') as f:
+    with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'r') as f:
         for line in f:
             x = line.split(",")
             return x[1]

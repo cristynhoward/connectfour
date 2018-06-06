@@ -17,9 +17,9 @@ def tweet():
             game = ConnectFourGame.game_from_string(doc["game"])
             sent = api.update_status(emoji.emojize(game.asemoji()), game.last_tweet)
         except tweepy.error.TweepError as e:
-            log(e.message)
+            log("TweepyError: "+ e.response.text)
         else:
-            set_last_wrote(game.last_tweet)
+            set_last_wrote(sent.id_str)
             game.last_tweet = sent.id_str
             log("Tweeted " + game.game_to_string())
             record_active_game(game)
