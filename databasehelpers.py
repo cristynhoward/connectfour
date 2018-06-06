@@ -17,14 +17,26 @@ def record_outgoing_tweet(game):
 
 
 def load_next_tweet():
+    """ Retrieve game with smallest last_tweet from the collection of outgoing tweets.
+
+    :return: Outgoing game with smallest last tweet.
+    :rtype: dict
+    """
+    db = pymongo.MongoClient(MY_URI).twitter_bot
+    doc = db.Outgoing_Tweets.find_one({}, projection=None, sort=[("_id", 1)])
+    log("Outgoing tweet retrieved: " + str(doc))
+    return doc
+
+
+def remove_tweet(tweet_id):
     """ Retrieve and remove game with smallest last_tweet from the collection of outgoing tweets.
 
     :return: Outgoing game with smallest last tweet.
     :rtype: dict
     """
     db = pymongo.MongoClient(MY_URI).twitter_bot
-    doc = db.Outgoing_Tweets.find_one_and_delete({}, projection=None, sort=[("_id", 1)])
-    log("Outgoing tweet retrieved and deleted: " + str(doc))
+    doc = db.Outgoing_Tweets.find_one_and_delete({"_id":str(tweet_id)}, projection=None, sort=[("_id", 1)])
+    log("Outgoing tweet deleted: " + str(doc))
     return doc
 
 
@@ -41,7 +53,7 @@ def record_active_game(game):
 
 
 def get_active_game(tweet_id):
-    """ Retrieve and remove game from the collection of active games.
+    """ Retrieve game from the collection of active games.
 
     :param tweet_id: The id of the last tweet in the game to be retrieved.
     :type tweet_id: str
@@ -49,6 +61,17 @@ def get_active_game(tweet_id):
     :rtype: dict
     """
     db = pymongo.MongoClient(MY_URI).twitter_bot
+    doc = db.Active_Games.find_one({"_id": tweet_id})
+    log("Active game retrieved: " + str(doc))
+    return doc
+
+
+def remove_active_game(tweet_id):
+    """ Retrieve and remove game from the collection of active games.
+
+    :param tweet_id: The id of the last tweet in the game to be retrieved and removed.
+    :type tweet_id: str
+    """
+    db = pymongo.MongoClient(MY_URI).twitter_bot
     doc = db.Active_Games.find_one_and_delete({"_id": tweet_id})
     log("Active game retrieved and deleted: " + str(doc))
-    return doc

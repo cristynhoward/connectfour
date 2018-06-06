@@ -58,6 +58,7 @@ def process_mentions():
                         log(active_user + " played a " + column_played +
                             " resulting in game: " + game.game_to_string())
                         record_outgoing_tweet(game)
+                        remove_active_game(tweet.in_reply_to_status_id)
 
 
 if __name__ == '__main__':

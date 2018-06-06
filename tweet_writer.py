@@ -19,6 +19,7 @@ def tweet():
         except tweepy.error.TweepError as e:
             log("TweepyError: "+ e.response.text)
         else:
+            remove_tweet(game.last_tweet)
             set_last_wrote(sent.id_str)
             game.last_tweet = sent.id_str
             log("Tweeted " + game.game_to_string())
