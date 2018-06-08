@@ -6,9 +6,18 @@ This repository contains the code for the connect four twitter bot.
 
 The Connect 4 Twitter bot was imagined & developed by Cristyn Howard.
 
-The gameplay is that of the classic game Connect Four (also known as Captain's Mistress, Four Up, Plot Four, Find Four, Four in a Row, Four in a Line and Gravitrips (in Soviet Union)), the origins of which are unclear.
+The gameplay is that of the classic game [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) (also known as Captain's Mistress, Four Up, Plot Four, Find Four, Four in a Row, Four in a Line and Gravitrips (in Soviet Union)), which has unknown origins.
 
-The name "Connect Four", and the classic plastic board from which the bot's emoji output is derived, are trademarks of Hasbro Inc. Copies of the game are available for purchase [here](https://www.hasbro.com/en-us/product/connect-4-game:80FB5BCA-5056-9047-F5F4-5EB5DF88DAF4).
+The name "Connect Four", and the [classic plastic boardgame](https://www.hasbro.com/en-us/product/connect-4-game:80FB5BCA-5056-9047-F5F4-5EB5DF88DAF4) from which the bot's emoji output is derived, are trademarks of Hasbro Inc.
+
+## Infrastructure
+
+@BotConnectFour is written in [Python](https://www.python.org/about/), and makes use of the [Tweepy](http://www.tweepy.org), [PyMongo](https://api.mongodb.com/python/current/), and [Emoji](https://pypi.org/project/emoji/) libraries.
+
+It is run from a [Digital Ocean](https://www.digitalocean.com) Ubuntu 16.04 droplet.
+
+It stores game data in a Sandbox-tier MongoDB instance, hosted with [mLab](https://mlab.com/welcome/).
+
 
 ## How to Play
 
