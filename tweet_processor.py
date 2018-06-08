@@ -44,7 +44,8 @@ def process_mentions():
 
                 active_user = game.user2
                 if game.a_is_playing == 1:
-                    active_user = game.user2
+                    active_user = game.user1
+                    
                 token = 2
                 if game.user1 == game.user2:
                     token = 1
