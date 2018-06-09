@@ -5,10 +5,10 @@ from secrets import *
 
 
 def access_database():
-    """
+    """ Attempt to access mLab MongoDB instance.
 
-    :return:
-    :rtype:
+    :return: MongoDB Database instance, or None
+    :rtype: pymongo.database.Database, None
     """
     try:
         db = pymongo.MongoClient(MY_URI).twitter_bot
@@ -20,14 +20,14 @@ def access_database():
 
 
 def record_in_collection(collection, game_to_insert):
-    """
+    """ Insert a game into a MongoDB collection.
 
-    :param collection:
-    :type collection:
-    :param game_to_insert:
-    :type game_to_insert:
-    :return:
-    :rtype:
+    :param collection: collection into which game will be inserted.
+    :type collection: pymongo.collection.Collection
+    :param game_to_insert: Game to be inserted into the collection.
+    :type game_to_insert: ConnectFourGame.ConnectFourGame
+    :return: Result of attempt to insert, or False if failure.
+    :rtype: pymongo.results.InsertOneResult, Boolean
     """
     gamestring = game_to_insert.game_to_string()
     out = {"_id": str(game_to_insert.last_tweet), "game": gamestring}
@@ -56,6 +56,8 @@ def record_outgoing_tweet(game):
 
     :param game: The game to be tweeted.
     :type game: ConnectFourGame.ConnectFourGame
+    :return: Result of insertion, or False if error occurred.
+    :rtype: pymongo.results.InsertOneResult, Boolean
     """
     outgoing_tweets = access_database().Outgoing_Tweets
     if outgoing_tweets is not None:
@@ -71,8 +73,10 @@ def record_outgoing_tweet(game):
 def record_active_game(game):
     """ Add a game to the collection of active games.
 
-    :param game: The game to be tweeted.
+    :param game: The active game to be recorded.
     :type game: ConnectFourGame.ConnectFourGame
+    :return: Result of insertion, or False if error occurred.
+    :rtype: pymongo.results.InsertOneResult, Boolean
     """
     active_games = access_database().Active_Games
     if active_games is not None:
@@ -88,7 +92,7 @@ def record_active_game(game):
 def load_next_tweet():
     """ Retrieve game with smallest last_tweet from the collection of outgoing tweets.
 
-    :return: Outgoing game with smallest last tweet, or None if Error encountered.
+    :return: Outgoing game with smallest last tweet, or None if error encountered.
     :rtype: dict, None
     """
     db = access_database()
@@ -106,7 +110,7 @@ def load_next_tweet():
 
 
 def get_active_game(tweet_id):
-    """ Retrieve game from the collection of active games.
+    """ Retrieve game with tweet_id from the collection of active games.
 
     :param tweet_id: The id of the last tweet in the game to be retrieved.
     :type tweet_id: str
@@ -128,14 +132,14 @@ def get_active_game(tweet_id):
 
 
 def remove_from_collection(collection, tweet_id):
-    """
+    """ Remove a game with tweet_id from a given collection.
 
-    :param collection:
-    :type collection:
-    :param game_to_insert:
-    :type game_to_insert:
-    :return:
-    :rtype:
+    :param collection: the collection from which the game will be removed.
+    :type collection: pymongo.collection.Collection
+    :param tweet_id: The id of the last tweet of the game to be removed.
+    :type tweet_id: str
+    :return: Document encoding game removed, or False if error occurred.
+    :rtype: dict, Boolean
     """
     try:
         result = collection.find_one_and_delete({"_id":str(tweet_id)})
@@ -154,10 +158,12 @@ def remove_from_collection(collection, tweet_id):
 
 
 def remove_tweet(tweet_id):
-    """ Retrieve and remove game with tweet_id from the collection of outgoing tweets.
+    """ Remove game with tweet_id from the collection of outgoing tweets.
 
-    :return: Outgoing game with smallest last tweet.
-    :rtype: dict
+    :param tweet_id: Tweet ID of game to be removed.
+    :type tweet_id: str
+    :return: Document encoding game removed, or False if error encountered.
+    :rtype: dict, Boolean
     """
     outgoing_tweets = access_database().Outgoing_Tweets
     if outgoing_tweets is not None:
@@ -171,10 +177,12 @@ def remove_tweet(tweet_id):
 
 
 def remove_active_game(tweet_id):
-    """ Retrieve and remove game from the collection of active games.
+    """ Reemove game from the collection of active games.
 
-    :param tweet_id: The id of the last tweet in the game to be retrieved and removed.
+    :param tweet_id: The id of the last tweet in the game to be removed.
     :type tweet_id: str
+    :return: Document encoding game removed, or False if error encountered.
+    :rtype: dict, Boolean
     """
     active_games = access_database().Active_Games
     if active_games is not None:

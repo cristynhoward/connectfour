@@ -8,7 +8,7 @@ class ConnectFourGame:
     """ A game of connect four played by the twitter bot.
     """
     def __init__(self, game_id, user1, user2, last_tweet,
-                 last_active, boardstring, a_is_playing, game_won):
+                 last_active, boardstring, user1_is_playing, game_won):
         """ Create a game instance with given values.
 
         :param game_id: The unique game identifier.
@@ -24,8 +24,8 @@ class ConnectFourGame:
         :param boardstring: board values in top-to-bottom & left-to-right,
                             column-by-column fashion.
         :type boardstring: str
-        :param a_is_playing: Indicates whose turn it is. 0 = false, 1 = true.
-        :type a_is_playing: int
+        :param user1_is_playing: Indicates whose turn it is. 0 = false, 1 = true.
+        :type user1_is_playing: int
         :param game_won: Indicates if game is over. 0 = false, 1 = true.
         :type game_won: int
         """
@@ -35,7 +35,7 @@ class ConnectFourGame:
         self.last_tweet = last_tweet
         self.last_active = last_active
         self.board = self.board_from_string(boardstring)
-        self.a_is_playing = a_is_playing
+        self.user1_is_playing = user1_is_playing
         self.game_won = game_won
 
     @staticmethod
@@ -102,7 +102,7 @@ class ConnectFourGame:
         for c in range(7):
             for d in range(6):
                 out = out + str(self.get_val(c, d))
-        out = out + "," + str(self.a_is_playing) + "," + str(self.game_won)
+        out = out + "," + str(self.user1_is_playing) + "," + str(self.game_won)
         return out
 
     def get_val(self, c, d):
@@ -126,7 +126,7 @@ class ConnectFourGame:
         :rtype: str
         """
         out = "@"
-        if self.a_is_playing == 1:
+        if self.user1_is_playing == 1:
             out = out + self.user2
         else:
             out = out + self.user1
@@ -148,11 +148,11 @@ class ConnectFourGame:
             out = out + "\n"
 
         out = out + "\n@" + self.user1 + "   :red_circle:"
-        if self.a_is_playing == 1:
+        if self.user1_is_playing == 1:
             out = out + " (next)"
 
         out = out + "\n" + "@" + self.user2 + "   :blue_circle:"
-        if self.a_is_playing != 1:
+        if self.user1_is_playing != 1:
             out = out + " (next)"
 
         return out
@@ -171,16 +171,16 @@ class ConnectFourGame:
             self.last_tweet = tweet_id
 
             user = 2
-            if self.a_is_playing == 1:
+            if self.user1_is_playing == 1:
                 user = 1
 
             self.place_piece(user, col)
             self.check_win()
 
-            if self.a_is_playing == 1:
-                self.a_is_playing = 0
+            if self.user1_is_playing == 1:
+                self.user1_is_playing = 0
             else:
-                self.a_is_playing = 1
+                self.user1_is_playing = 1
 
     def place_piece(self, user, column):
         """ Put a game piece in a specific column on the game board.

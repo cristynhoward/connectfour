@@ -43,9 +43,9 @@ def process_mentions():
                 game = ConnectFourGame.game_from_string(doc["game"])
 
                 active_user = game.user2
-                if game.a_is_playing == 1:
+                if game.user1_is_playing == 1:
                     active_user = game.user1
-                    
+
                 token = 2
                 if game.user1 == game.user2:
                     token = 1
