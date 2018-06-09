@@ -6,11 +6,9 @@ This repository contains the code for the connect four twitter bot.
 
 #### The connect four twitter bot was imagined & developed by cristyn howard.
 
-The gameplay is that of the classic [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) (also known as Captain's Mistress, Four Up, Plot Four, Find Four, Four in a Row, Four in a Line and Gravitrips (in Soviet Union)). The origins of Connect Four are unknown.
+The gameplay is that of the classic [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) (also known as Captain's Mistress, Four Up, Plot Four, Find Four, Four in a Row, Four in a Line and Gravitrips (in Soviet Union)), which has unknown origins.
 
 The name "Connect Four", and the [plastic boardgame](https://www.hasb.com/en-us/product/connect-4-game:80FB5BCA-5056-9047-F5F4-5EB5DF88DAF4) from which the bot's emoji aesthetic is derived, are trademarks of Hasbro Inc.
-
-Early development of @BotConnectFour made use of code snippets from Molly White's [Twitterbot Framework](https://github.com/molly/twitterbot_framework).
 
 ## Infrastructure
 
@@ -29,17 +27,7 @@ It stores game data in a Sandbox-tier MongoDB instance, hosted with [mLab](https
 
 3. WIN: when you get 4 in a row!
 
-Inactive games are deleted after
-
-## Accessibility
-
-@BotConnectFour only accepts Arabic numerals as player inputs.
-
-Unfortunately, due to the highly visual game-play, @BotConnectFour is not accessible to Twitter users who rely on text-to-speech software.
-
 ## Code of Conduct
-
-* Users of @BotConnectFour are subject to the Twitter [Terms of Service](https://twitter.com/en/tos) and must follow the [Twitter Rules](https://help.twitter.com/en/rules-and-policies/twitter-rules).
 
 * Users are prohibited from using @BotConnectFour to harass or annoy other Twitter users with repeated, unwanted game requests.
 
@@ -47,6 +35,10 @@ Unfortunately, due to the highly visual game-play, @BotConnectFour is not access
 
 * Users who violate the CoC are subject to blocks from @BotConnectFour
 
-## License
+## Accessibility
 
-@BotConnectFour's software is licensed under the [MIT License](https://github.com/cristynhoward/connectfour/blob/master/LICENSE.txt).
+@BotConnectFour only accepts Arabic numerals as player inputs.
+
+Unfortunately, due to the highly visual game-play, @BotConnectFour is not accessible to Twitter users who rely on text-to-speech software.
+
+
