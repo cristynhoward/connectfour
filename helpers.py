@@ -73,13 +73,9 @@ def get_read_since():
     :return: the ID of the last tweet read.
     :rtype: str
     """
-    print("getting read since")
     with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'r') as f:
-        print("opened file")
         for line in f:
-            print(str(line))
             x = line.split(",")
-            print(str(x[0]))
             return x[0]
 
 
