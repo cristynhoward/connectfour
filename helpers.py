@@ -28,12 +28,22 @@ def limit_handled(cursor):
 
 
 def getpath():
-    """ Returns the filepath to the present file."""
+    """ Generate filepath to the present file.
+
+    :return: filepath to the present file.
+    :rtype: str
+    """
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 def log(message):
-    """ Log message to logfile."""
+    """ Log a message in the bot log file.
+
+    :param message: The message to be recorded.
+    :type message: str
+    :return: None
+    :rtype: None
+    """
     print(message)
     day = strftime("%d_%b_%Y", gmtime())
     with open(os.path.join(getpath(), "data/logs/" + day + "_bot.log"), 'a+') as f:
@@ -63,18 +73,15 @@ def get_read_since():
     :return: the ID of the last tweet read.
     :rtype: str
     """
-    print("getting read since")
     with open(os.path.join(getpath(), "data/tweetinfo.csv"), 'r') as f:
-        print("opened file")
         for line in f:
-            print(str(line))
             x = line.split(",")
-            print(str(x[0]))
             return x[0]
 
 
 def get_last_wrote():
-    """ Get the ID of the last tweet written.
+    """Get the ID of the last tweet written.
+
     :return: the ID of the last tweet written.
     :rtype: str
     """
