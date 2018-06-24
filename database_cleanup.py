@@ -14,9 +14,9 @@ def cleanup_active_games():
     """
     db = access_database()
     if db is not None:
-        active_games = db.Active_Games
 
-        for document in active_games.find():
+        log("Cleaning up database.")
+        for document in db.Active_Games.find():
             game_to_check = ConnectFourGame.game_from_string(document["game"])
 
             diff = datetime.now() - game_to_check.last_active
