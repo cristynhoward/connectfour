@@ -28,7 +28,7 @@ def process_mentions():
 
         if tweet.in_reply_to_status_id is None:       # not reply to another tweet
             if len(tweet.entities[u'user_mentions']) > 1:  # > 1 other user mentioned
-                if tweet.text.split(" ")[1] == "new":       # secondword is 'new'
+                if tweet.text.split(" ")[1] == "new":       # second word is 'new'
 
                     #  NEW GAME
                     user1 = tweet.user.screen_name
@@ -43,16 +43,17 @@ def process_mentions():
                 game = ConnectFourGame.game_from_string(doc["game"])
 
                 active_user = game.user2
-                if game.a_is_playing == 1:
+                if game.user1_is_playing == 1:
                     active_user = game.user1
-                    
-                token = 2
-                if game.user1 == game.user2:
-                    token = 1
 
-                if (tweet.user.screen_name == active_user) & (game.game_won == 0):
-                    column_played = tweet.text.split(" ")[token]
-                    if any(column_played == s for s in ["1", "2", "3", "4", "5", "6", "7"]):
+                move_index = 2
+                if game.user1 == game.user2:
+                    move_index = 1
+
+                column_played = tweet.text.split(" ")[move_index]
+
+                if any(column_played == s for s in ["1", "2", "3", "4", "5", "6", "7"]):
+                    if (tweet.user.screen_name == active_user) & game.can_play(int(column_played)):
 
                         #  PLAY TURN
                         game.play_turn(int(tweet.id_str), int(column_played))

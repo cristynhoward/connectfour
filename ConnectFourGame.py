@@ -8,7 +8,7 @@ class ConnectFourGame:
     """ A game of connect four played by the twitter bot.
     """
     def __init__(self, game_id, user1, user2, last_tweet,
-                 last_active, boardstring, a_is_playing, game_won):
+                 last_active, boardstring, num_turns, user1_is_playing, game_won):
         """ Create a game instance with given values.
 
         :param game_id: The unique game identifier.
@@ -24,8 +24,10 @@ class ConnectFourGame:
         :param boardstring: board values in top-to-bottom & left-to-right,
                             column-by-column fashion.
         :type boardstring: str
-        :param a_is_playing: Indicates whose turn it is. 0 = false, 1 = true.
-        :type a_is_playing: int
+        :param num_turns: Number of moves played on game so far.
+        :type num_turns: int
+        :param user1_is_playing: Indicates whose turn it is. 0 = false, 1 = true.
+        :type user1_is_playing: int
         :param game_won: Indicates if game is over. 0 = false, 1 = true.
         :type game_won: int
         """
@@ -35,7 +37,8 @@ class ConnectFourGame:
         self.last_tweet = last_tweet
         self.last_active = last_active
         self.board = self.board_from_string(boardstring)
-        self.a_is_playing = a_is_playing
+        self.num_turns = num_turns
+        self.user1_is_playing = user1_is_playing
         self.game_won = game_won
 
     @staticmethod
@@ -72,7 +75,7 @@ class ConnectFourGame:
         :rtype: ConnectFourGame
         """
         boardstring = "000000000000000000000000000000000000000000"
-        game = ConnectFourGame(id, user1, user2, last_tweet, datetime.now(), boardstring, 0, 0)
+        game = ConnectFourGame(id, user1, user2, last_tweet, datetime.now(), boardstring, 0, 0, 0)
         return game
 
     @staticmethod
@@ -88,7 +91,7 @@ class ConnectFourGame:
         if len(tokens) >= 8:
             datetime_object = datetime.strptime(tokens[4], '%Y-%m-%d %H:%M:%S.%f')
             game = ConnectFourGame(int(tokens[0]), tokens[1], tokens[2], int(tokens[3]),
-                                   datetime_object, tokens[5], int(tokens[6]), int(tokens[7]))
+                                   datetime_object, tokens[5], int(tokens[6]), int(tokens[7]), int(tokens[8]))
             return game
 
     def game_to_string(self):
@@ -102,7 +105,7 @@ class ConnectFourGame:
         for c in range(7):
             for d in range(6):
                 out = out + str(self.get_val(c, d))
-        out = out + "," + str(self.a_is_playing) + "," + str(self.game_won)
+        out = out + "," + str(self.num_turns) + "," + str(self.user1_is_playing) + "," + str(self.game_won)
         return out
 
     def get_val(self, c, d):
@@ -119,6 +122,17 @@ class ConnectFourGame:
             col = self.board[c]
             return int(col[d])
 
+    def can_play(self, col):
+        """ Check that game and column can be played on.
+
+        :param col: The column being accessed. 1-indexed.
+        :type col: int
+        :return: Whether user can play on this game in column.
+        :rtype: Boolean
+        """
+        return self.game_won == 0 and self.num_turns < 42 \
+               and self.get_val(col-1, 0) == 0
+
     def asemoji(self):
         """ Output the game in an emojiful tweet-friendly representation.
 
@@ -126,7 +140,7 @@ class ConnectFourGame:
         :rtype: str
         """
         out = "@"
-        if self.a_is_playing == 1:
+        if self.user1_is_playing == 1:
             out = out + self.user2
         else:
             out = out + self.user1
@@ -148,12 +162,12 @@ class ConnectFourGame:
             out = out + "\n"
 
         out = out + "\n@" + self.user1 + "   :red_circle:"
-        if self.a_is_playing == 1:
-            out = out + " (next)"
+        if self.user1_is_playing == 1:
+            out = out + " :UP!_button:"
 
         out = out + "\n" + "@" + self.user2 + "   :blue_circle:"
-        if self.a_is_playing != 1:
-            out = out + " (next)"
+        if self.user1_is_playing != 1:
+            out = out + " :UP!_button:"
 
         return out
 
@@ -166,21 +180,23 @@ class ConnectFourGame:
         :type col: int
         :rtype: None
         """
-        if self.game_won == 0:  # if game not over...
+        if self.can_play(col):
             self.last_active = datetime.now()
             self.last_tweet = tweet_id
 
             user = 2
-            if self.a_is_playing == 1:
+            if self.user1_is_playing == 1:
                 user = 1
 
             self.place_piece(user, col)
             self.check_win()
 
-            if self.a_is_playing == 1:
-                self.a_is_playing = 0
+            if self.user1_is_playing == 1:
+                self.user1_is_playing = 0
             else:
-                self.a_is_playing = 1
+                self.user1_is_playing = 1
+
+            self.num_turns += 1
 
     def place_piece(self, user, column):
         """ Put a game piece in a specific column on the game board.
