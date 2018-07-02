@@ -2,8 +2,6 @@
 
 @BotConnectFour is a tool that brings the classic game of [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) (also known as Captain's Mistress, Four Up, Plot Four, Find Four, Four in a Row, Four in a Line and Gravitrips (in Soviet Union)) to Twitter.
 
-The origins of Connect Four are unknown.
-
 ## Acknowledgments
 
 #### The Connect Four Twitter bot was imagined & developed by Cristyn Howard.
@@ -43,6 +41,8 @@ Unfortunately, due to the highly visual game-play, @BotConnectFour is not access
 * Users are prohibited from using @BotConnectFour to harass or annoy other Twitter users with repeated, unwanted game requests.
 
 * Users are prohibited from using @BotConnectFour circumvent another Twitter user's block settings and deliver unwanted notifications.
+
+* CoC violations may be reported via [Twitter Direct Message](https://help.twitter.com/en/using-twitter/direct-messages) to @BotConnectFour.
 
 * Users who violate the CoC are subject to blocks from @BotConnectFour
 
