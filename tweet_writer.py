@@ -13,11 +13,13 @@ def tweet():
     if doc is None:
         log("No game replies to be made.")
     else:
+        game = ConnectFourGame.game_from_string(doc["game"])
         try:
-            game = ConnectFourGame.game_from_string(doc["game"])
             sent = api.update_status(emoji.emojize(game.asemoji()), game.last_tweet)
         except tweepy.error.TweepError as e:
             log("TweepyError: "+ e.response.text)
+            if e.response.text["errors"]["code"] in [187, "187"]: # if Status is a duplicate.
+                remove_tweet(game.last_tweet)
         else:
             remove_tweet(game.last_tweet)
             set_last_wrote(sent.id_str)
