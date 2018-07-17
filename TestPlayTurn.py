@@ -68,7 +68,7 @@ class TestPlayTurn(unittest.TestCase):
         self.assertIsNone(fake_turn)
 
     def test_minimax_v1(self):
-        self.doc = {'game': "127,fake_author,mimimax_ai_version1,1234,2018-07-17 00:28:59.979175,"
+        self.doc = {'game': "127,fake_author, mimimax_ai_alpha,1234,2018-07-17 00:28:59.979175,"
                             "000000000002000000000000000000000000000000,1,1,0"}
         self.fake_status.user.__setattr__('screen_name', 'fake_author')
         self.fake_status.__setattr__('text', "@bot_mention 4")
@@ -77,7 +77,7 @@ class TestPlayTurn(unittest.TestCase):
         self.assertEquals(fake_turn.num_turns, 3)
         self.assertEquals(fake_turn.last_tweet, 333)
         self.assertEquals(fake_turn.user1, 'fake_author')
-        self.assertEquals(fake_turn.user2, 'mimimax_ai_version1')
+        self.assertEquals(fake_turn.user2, ' mimimax_ai_alpha')
         self.assertEquals(fake_turn.user1_is_playing, 1)
 
 if __name__ == '__main__':

@@ -53,7 +53,7 @@ class TestNewGames(unittest.TestCase):
         self.assertEquals(fake_newgame.last_tweet, 12345678)
         self.assertEquals(fake_newgame.user1_is_playing, 1)
         self.assertEquals(fake_newgame.user1, 'fake_author')
-        self.assertEquals(fake_newgame.user2, 'mimimax_ai_version1')
+        self.assertEquals(fake_newgame.user2, ' mimimax_ai_alpha')
 
 if __name__ == '__main__':
     unittest.main()

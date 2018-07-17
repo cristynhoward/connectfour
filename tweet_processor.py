@@ -63,7 +63,7 @@ def try_newgame(tweet):
 
             # ONE PLAYER GAME
             if tweet.text.split(" ")[2] == "singleplayer":
-                user2 = "mimimax_ai_version1"
+                user2 = " mimimax_ai_alpha"
                 newgame = ConnectFourGame.new_game(get_next_game_id(), user1, user2, int(tweet.id_str))
                 newgame.play_turn(int(tweet.id_str), minimax(newgame, 3))
                 log("Created one player game: " + newgame.game_to_string())
@@ -88,7 +88,7 @@ def try_playturn(tweet, doc):
         active_user = game.user1
 
     move_index = 2
-    if game.user1 == game.user2 or game.user2 == "mimimax_ai_version1":
+    if game.user1 == game.user2 or game.user2 == " mimimax_ai_alpha":
         move_index = 1
 
     tweet_text = tweet.text.split(" ")
@@ -101,7 +101,7 @@ def try_playturn(tweet, doc):
                 game.play_turn(int(tweet.id_str), int(column_played))
                 log(active_user + " played a " + column_played + " resulting in game: " + game.game_to_string())
 
-                if game.user2 == 'mimimax_ai_version1':
+                if game.user2 == ' mimimax_ai_alpha':
                     ai_move = minimax(game, 3)
                     game.play_turn(int(tweet.id_str), ai_move)
                     log("mimimax_ai_v1 played a " + str(ai_move) + " resulting in game: " + game.game_to_string())
