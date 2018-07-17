@@ -3,6 +3,7 @@
 from ConnectFourGame import *
 from databasehelpers import *
 from helpers import *
+from minimax import *
 
 
 def process_mentions():
@@ -27,12 +28,12 @@ def process_mentions():
             newest_tweet_id = tweet.id_str
             first = False
 
-        if tweet.in_reply_to_status_id is None:  # Check if mention opens a valid game.
+        if tweet.in_reply_to_status_id is None:  # Check if mention starts a game thread.
             result_newgame = try_newgame(tweet)
             if result_newgame is not None:
                 record_outgoing_tweet(result_newgame)
 
-        else:   # Check if mention is a valid play on an existing game.
+        else:   # Check if mention is a valid play on an existing game thread.
             doc = get_active_game(str(tweet.in_reply_to_status_id))
             if doc is not None:
                 result_game = try_playturn(tweet, doc)
@@ -49,13 +50,23 @@ def try_newgame(tweet):
     :return: The resulting new game, or None if no new game made.
     :rtype: None, ConnectFourGame
     """
-    if tweet.in_reply_to_status_id is None:             # not reply to another tweet
-        if len(tweet.entities[u'user_mentions']) > 1:   # > 1 other user mentioned
-            if tweet.text.split(" ")[1] == "new":       # second word is 'new'
-                user1 = tweet.user.screen_name
+    if tweet.in_reply_to_status_id is None:    # not reply to another tweet
+        if tweet.text.split(" ")[1] == "new":  # second word is 'new'
+            user1 = tweet.user.screen_name
+
+            # TWO PLAYER GAME
+            if len(tweet.entities[u'user_mentions']) > 1:
                 user2 = tweet.entities[u'user_mentions'][1][u'screen_name']
                 newgame = ConnectFourGame.new_game(get_next_game_id(), user1, user2, int(tweet.id_str))
-                log("Created new game: " + newgame.game_to_string())
+                log("Created two player game: " + newgame.game_to_string())
+                return newgame
+
+            # ONE PLAYER GAME
+            if tweet.text.split(" ")[2] == "singleplayer":
+                user2 = "mimimax_ai_version1"
+                newgame = ConnectFourGame.new_game(get_next_game_id(), user1, user2, int(tweet.id_str))
+                newgame.play_turn(int(tweet.id_str), minimax(newgame, 3))
+                log("Created one player game: " + newgame.game_to_string())
                 return newgame
 
 
@@ -77,7 +88,7 @@ def try_playturn(tweet, doc):
         active_user = game.user1
 
     move_index = 2
-    if game.user1 == game.user2:
+    if game.user1 == game.user2 or game.user2 == "mimimax_ai_version1":
         move_index = 1
 
     tweet_text = tweet.text.split(" ")
@@ -89,6 +100,12 @@ def try_playturn(tweet, doc):
                 #  PLAY TURN
                 game.play_turn(int(tweet.id_str), int(column_played))
                 log(active_user + " played a " + column_played + " resulting in game: " + game.game_to_string())
+
+                if game.user2 == 'mimimax_ai_version1':
+                    ai_move = minimax(game, 3)
+                    game.play_turn(int(tweet.id_str), ai_move)
+                    log("mimimax_ai_v1 played a " + str(ai_move) + " resulting in game: " + game.game_to_string())
+
                 return game
 
 
