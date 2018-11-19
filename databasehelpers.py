@@ -1,4 +1,4 @@
-""" Helper functions for storing games in a MongoDB instance. """
+""" Helper functions for storing ConnectFourGames in a MongoDB instance. """
 import pymongo
 from helpers import *
 from secrets import *
@@ -25,7 +25,7 @@ def record_in_collection(collection, game_to_insert):
     :param collection: collection into which game will be inserted.
     :type collection: pymongo.collection.Collection
     :param game_to_insert: Game to be inserted into the collection.
-    :type game_to_insert: ConnectFourGame.ConnectFourGame
+    :type game_to_insert: ConnectFourGame
     :return: Result of attempt to insert, or False if failure.
     :rtype: pymongo.results.InsertOneResult, Boolean
     """
@@ -60,14 +60,16 @@ def record_outgoing_tweet(game):
     :rtype: pymongo.results.InsertOneResult, Boolean
     """
     outgoing_tweets = access_database().Outgoing_Tweets
-    if outgoing_tweets is not None:
+    if outgoing_tweets is None:
+        return False
+    else:
         result = record_in_collection(outgoing_tweets, game)
         if result is not False:
             log("Outgoing tweet recorded: " + game.game_to_string())
             return result
         else:
             log("ERROR: Outgoing tweet NOT recorded: " + game.game_to_string())
-            return False
+            return result
 
 
 def record_active_game(game):
@@ -79,14 +81,16 @@ def record_active_game(game):
     :rtype: pymongo.results.InsertOneResult, Boolean
     """
     active_games = access_database().Active_Games
-    if active_games is not None:
+    if active_games is None:
+        return False
+    else:
         result = record_in_collection(active_games, game)
         if result is not False:
             log("Active game recorded: " + game.game_to_string())
             return result
         else:
             log("ERROR: Active game NOT recorded: " + game.game_to_string())
-            return False
+            return result
 
 
 def load_next_tweet():
@@ -166,14 +170,16 @@ def remove_tweet(tweet_id):
     :rtype: dict, Boolean
     """
     outgoing_tweets = access_database().Outgoing_Tweets
-    if outgoing_tweets is not None:
+    if outgoing_tweets is None:
+        return False
+    else:
         result = remove_from_collection(outgoing_tweets, tweet_id)
         if result is not False:
             log("Outgoing tweet deleted: " + str(tweet_id))
             return result
         else:
             log("ERROR: Outgoing tweet NOT deleted: " + str(tweet_id))
-            return False
+            return result
 
 
 def remove_active_game(tweet_id):
@@ -185,11 +191,13 @@ def remove_active_game(tweet_id):
     :rtype: dict, Boolean
     """
     active_games = access_database().Active_Games
-    if active_games is not None:
+    if active_games is None:
+        return False
+    else:
         result = remove_from_collection(active_games, tweet_id)
         if result is not False:
             log("Active game deleted: " + str(tweet_id))
             return result
         else:
             log("ERROR: Active game NOT deleted: " + str(tweet_id))
-            return False
+            return result
