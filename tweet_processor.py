@@ -1,10 +1,9 @@
 """ Module for processing mentions of the bot via the Twitter API.
 """
-from ConnectFourGame import *
+from TwitterConnectFourGame import *
 from databasehelpers import *
 from helpers import *
 from minimax import *
-
 
 def process_mentions():
     """ Scan through recent mentions and send them to be processed.
@@ -30,13 +29,16 @@ def process_mentions():
 
         if tweet.in_reply_to_status_id is None:  # Check if mention starts a game thread.
             result_newgame = try_newgame(tweet)
-            if result_newgame is not None:
+
+            if result_newgame is None:
+                log("Error starting new game from tweet " + tweet.id_str + ".")
+            else:
                 record_outgoing_tweet(result_newgame)
 
         else:   # Check if mention is a valid play on an existing game thread.
             doc = get_active_game(str(tweet.in_reply_to_status_id))
             if doc is not None:
-                result_game = try_playturn(tweet, doc)
+                result_game = try_playturn(tweet, doc["game"])
                 if result_game is not None:
                     record_outgoing_tweet(result_game)
                     remove_active_game(str(tweet.in_reply_to_status_id))
@@ -48,7 +50,7 @@ def try_newgame(tweet):
     :param tweet: The tweet to be processed as new game.
     :type tweet: Tweepy.Status, dict
     :return: The resulting new game, or None if no new game made.
-    :rtype: None, ConnectFourGame
+    :rtype: None, TwitterConnectFourGame
     """
     if tweet.in_reply_to_status_id is None:    # not reply to another tweet
         if tweet.text.split(" ")[1] == "new":  # second word is 'new'
@@ -57,56 +59,63 @@ def try_newgame(tweet):
             # TWO PLAYER GAME
             if len(tweet.entities[u'user_mentions']) > 1:
                 user2 = tweet.entities[u'user_mentions'][1][u'screen_name']
-                newgame = ConnectFourGame.new_game(get_next_game_id(), user1, user2, int(tweet.id_str))
+                newgame = TwitterConnectFourGame.new_tcfg(get_next_game_id(), user1, user2, int(tweet.id_str))
                 log("Created two player game: " + newgame.game_to_string())
                 return newgame
 
             # ONE PLAYER GAME
             if tweet.text.split(" ")[2] == "singleplayer":
                 user2 = " mimimax_ai_alpha"
-                newgame = ConnectFourGame.new_game(get_next_game_id(), user1, user2, int(tweet.id_str))
-                newgame.play_turn(int(tweet.id_str), minimax(newgame, 3))
+                newgame = TwitterConnectFourGame.new_tcfg(get_next_game_id(), user1, user2, int(tweet.id_str))
+                newgame.play_turn_tcfg(int(tweet.id_str), minimax(newgame, 3))
                 log("Created one player game: " + newgame.game_to_string())
                 return newgame
 
 
-def try_playturn(tweet, doc):
+def try_playturn(tweet, gamestring):
     """ Process a single tweet as an attempted move on an open game.
 
     :param tweet: The tweet to be processed as an attempted move on an open game.
     :type tweet: Tweepy.Status, dict
-    :param doc: The database item storing the game onto which the turn is played.
-    :type doc: dict
+    :param doc: dict; The database item storing the game onto which the turn is played.
     :return: The resulting game after the move is played, or None if move not played.
-    :rtype: ConnectFourGame, None
+    :rtype: TwitterConnectFourGame, None
     """
 
-    game = ConnectFourGame.game_from_string(doc["game"])
+    game = TwitterConnectFourGame.game_from_string(gamestring)
 
-    active_user = game.user2
-    if game.user1_is_playing == 1:
-        active_user = game.user1
+    if game is None:
+        log("Error instantiating active game from string.")
+    else:
+        active_user = game.user2
+        if game.user1_is_playing == 1:
+            active_user = game.user1
 
-    move_index = 2
-    if game.user1 == game.user2 or game.user2 == " mimimax_ai_alpha":
-        move_index = 1
+        is_game_against_self = game.user1 == game.user2
+        is_game_against_ai = game.user2 == " mimimax_ai_alpha"
+        is_singleplayer = is_game_against_self or is_game_against_ai
 
-    tweet_text = tweet.text.split(" ")
-    if len(tweet_text) >= move_index + 1:
+        move_index = 2
+        if is_singleplayer:
+            move_index = 1
 
-        column_played = tweet_text[move_index]
-        if any(column_played == s for s in ["1", "2", "3", "4", "5", "6", "7"]):
-            if (tweet.user.screen_name == active_user) & game.can_play(int(column_played)):
-                #  PLAY TURN
-                game.play_turn(int(tweet.id_str), int(column_played))
-                log(active_user + " played a " + column_played + " resulting in game: " + game.game_to_string())
+        tweet_text = tweet.text.split(" ")
+        if len(tweet_text) >= move_index + 1:
 
-                if game.user2 == ' mimimax_ai_alpha':
-                    ai_move = minimax(game, 3)
-                    game.play_turn(int(tweet.id_str), ai_move)
-                    log("mimimax_ai_v1 played a " + str(ai_move) + " resulting in game: " + game.game_to_string())
+            column_played = tweet_text[move_index]
+            if any(column_played == s for s in ["1", "2", "3", "4", "5", "6", "7"]):
+                if (tweet.user.screen_name == active_user) & game.can_play(int(column_played)):
+                    
+                    #  PLAY TURN
+                    game.play_turn_tcfg(int(tweet.id_str), int(column_played))
+                    log(active_user + " played a " + column_played + " resulting in game: " + game.game_to_string())
 
-                return game
+                    if game.user2 == ' mimimax_ai_alpha':
+                        ai_move = minimax(game, 3)
+                        game.play_turn_tcfg(int(tweet.id_str), ai_move)
+                        log("mimimax_ai_v1 played a " + str(ai_move) + " resulting in game: " + game.game_to_string())
+
+                    return game
 
 
 if __name__ == '__main__':

@@ -30,7 +30,7 @@ def record_in_collection(collection, game_to_insert):
     :rtype: pymongo.results.InsertOneResult, Boolean
     """
     gamestring = game_to_insert.game_to_string()
-    out = {"_id": str(game_to_insert.last_tweet), "game": gamestring}
+    out = {"_id": str(game_to_insert.get_unique_id), "game": gamestring}
     try:
         result = collection.insert_one(out)
 
@@ -113,21 +113,21 @@ def load_next_tweet():
             return doc
 
 
-def get_active_game(tweet_id):
-    """ Retrieve game with tweet_id from the collection of active games.
+def get_active_game(unique_id):
+    """ Retrieve game with unique_id from the collection of active games.
 
-    :param tweet_id: The id of the last tweet in the game to be retrieved.
-    :type tweet_id: str
-    :return: Active game with tweet_id, or None if Error encountered.
+    :param unique_id: The id of the game to be retrieved.
+    :type unique_id: str
+    :return: Active game with unique_id, or None if Error encountered.
     :rtype: dict, None
     """
     db = access_database()
     if db is not None:
         try:
-            doc = db.Active_Games.find_one({"_id": tweet_id})
+            doc = db.Active_Games.find_one({"_id": unique_id})
 
         except pymongo.errors.PyMongoError as e:
-            log("Pymongo Error, get_active_game, "+str(tweet_id))
+            log("Pymongo Error, get_active_game, "+str(unique_id))
             log(e)
 
         else:
@@ -135,25 +135,25 @@ def get_active_game(tweet_id):
             return doc
 
 
-def remove_from_collection(collection, tweet_id):
-    """ Remove a game with tweet_id from a given collection.
+def remove_from_collection(collection, unique_id):
+    """ Remove a game with unique_id from a given collection.
 
     :param collection: the collection from which the game will be removed.
     :type collection: pymongo.collection.Collection
-    :param tweet_id: The id of the last tweet of the game to be removed.
-    :type tweet_id: str
+    :param unique_id: The id of the game to be removed.
+    :type unique_id: str
     :return: Document encoding game removed, or False if error occurred.
     :rtype: dict, Boolean
     """
     try:
-        result = collection.find_one_and_delete({"_id":str(tweet_id)})
+        result = collection.find_one_and_delete({"_id":str(unique_id)})
 
     except pymongo.errors.ExecutionTimeout as e:
-        log("ERROR: Execution Timeout, delete, " + tweet_id)
+        log("ERROR: Execution Timeout, delete, " + unique_id)
         log(e)
         return False
     except pymongo.errors.PyMongoError as e:
-        log("ERROR: Pymongo Error, delete, " + tweet_id)
+        log("ERROR: Pymongo Error, delete, " + unique_id)
         log(e)
         return False
 
@@ -182,22 +182,32 @@ def remove_tweet(tweet_id):
             return result
 
 
-def remove_active_game(tweet_id):
+def remove_active_game(unique_id):
     """ Reemove game from the collection of active games.
 
-    :param tweet_id: The id of the last tweet in the game to be removed.
-    :type tweet_id: str
+    :param unique_id: The id of the last tweet in the game to be removed.
+    :type unique_id: str
     :return: Document encoding game removed, or False if error encountered.
     :rtype: dict, Boolean
     """
     active_games = access_database().Active_Games
+<<<<<<< HEAD
     if active_games is None:
         return False
     else:
         result = remove_from_collection(active_games, tweet_id)
+=======
+    if active_games is not None:
+        result = remove_from_collection(active_games, unique_id)
+>>>>>>> Split Connect Four functionality and Twitter-specific functionality into parent and child classes.
         if result is not False:
-            log("Active game deleted: " + str(tweet_id))
+            log("Active game deleted: " + str(unique_id))
             return result
         else:
+<<<<<<< HEAD
             log("ERROR: Active game NOT deleted: " + str(tweet_id))
             return result
+=======
+            log("ERROR: Active game NOT deleted: " + str(unique_id))
+            return False
+>>>>>>> Split Connect Four functionality and Twitter-specific functionality into parent and child classes.

@@ -1,6 +1,6 @@
 """ Module for sending out tweets via the Twitter API. """
 import emoji
-from ConnectFourGame import *
+from TwitterConnectFourGame import *
 from databasehelpers import *
 from helpers import *
 
@@ -13,7 +13,7 @@ def tweet():
     if doc is None:
         log("No game replies to be made.")
     else:
-        game = ConnectFourGame.game_from_string(doc["game"])
+        game = TwitterConnectFourGame.game_from_string(doc["game"])
         try:
             sent = api.update_status(emoji.emojize(game.asemoji()), game.last_tweet)
         except tweepy.error.TweepError as e:

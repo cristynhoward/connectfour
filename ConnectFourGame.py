@@ -1,52 +1,44 @@
 """
 This module contains the connect four game board and it's operations.
 """
-from datetime import datetime
 
 
 class ConnectFourGame:
-    """ A game of connect four played by the twitter bot.
+    """ A game of connect four.
     """
-    def __init__(self, game_id, user1, user2, last_tweet,
-                 last_active, boardstring, num_turns, user1_is_playing, game_won):
+
+    def __init__(self, game_id, boardstring, num_turns, user1_is_playing, game_won):
         """ Create a game instance with given values.
 
-        :param game_id: The unique game identifier.
-        :type game_id: int
-        :param user1: The screen name of user 1.
-        :type user1: str
-        :param user2: The screen name of user 2.
-        :type user2: str
-        :param last_tweet: The ID of the last tweet in the thread.
-        :type last_tweet: int
-        :param last_active: Date the game was last active.
-        :type last_active: datetime
-        :param boardstring: board values in top-to-bottom & left-to-right,
+        :param game_id: int; The unique game identifier.
+        :param boardstring: str; board values in top-to-bottom & left-to-right,
                             column-by-column fashion.
-        :type boardstring: str
-        :param num_turns: Number of moves played on game so far.
-        :type num_turns: int
-        :param user1_is_playing: Indicates whose turn it is. 0 = false, 1 = true.
-        :type user1_is_playing: int
-        :param game_won: Indicates if game is over. 0 = false, 1 = true.
-        :type game_won: int
+        :param num_turns: int; Number of moves played on game so far.
+        :param user1_is_playing: int; Indicates whose turn it is. 0 = false, 1 = true.
+        :param game_won: int; Indicates if game is over. 0 = false, 1 = true.
         """
         self.game_ID = game_id
-        self.user1 = user1
-        self.user2 = user2
-        self.last_tweet = last_tweet
-        self.last_active = last_active
         self.board = self.board_from_string(boardstring)
         self.num_turns = num_turns
         self.user1_is_playing = user1_is_playing
         self.game_won = game_won
 
     @staticmethod
+    def new_game(game_id):
+        """Creates a new game.
+
+        :param game_id: int; The unique ID of this game.
+        :return: A fresh connect four game.
+        :rtype: ConnectFourGame
+        """
+        boardstring = "000000000000000000000000000000000000000000"
+        return ConnectFourGame(game_id, boardstring, 0, 0, 0)
+
+    @staticmethod
     def board_from_string(boardstring):
         """ Given a string representation of a connect four board, create a 2D int array.
 
-        :param boardstring: a string representation of the connect four board.
-        :type boardstring: str
+        :param boardstring: str; a string representation of the connect four board.
         :return: a 2D int array representing the 7x6 connect four board.
         :rtype: int[][]
         """
@@ -59,64 +51,47 @@ class ConnectFourGame:
             board.append(col)
         return board
 
-    @staticmethod
-    def new_game(id, user1, user2, last_tweet):
-        """Creates a new game.
-
-        :param id: The unique ID of this game.
-        :type id: int
-        :param user1: The username of the first user.
-        :type user1: str
-        :param user2: The username of the first user.
-        :type user2: str
-        :param last_tweet: The ID of the most recent tweet in the game.
-        :type last_tweet: int
-        :return: A fresh connect four game.
-        :rtype: ConnectFourGame
-        """
-        boardstring = "000000000000000000000000000000000000000000"
-        game = ConnectFourGame(id, user1, user2, last_tweet, datetime.now(), boardstring, 0, 0, 0)
-        return game
+    def board_to_string(self):
+        out = ""
+        for c in range(7):
+            for d in range(6):
+                out = out + str(self.get_val(c, d))
+        return out
 
     @staticmethod
     def game_from_string(gamestring):
         """ Instantiate a game with parameters encoded in a string.
 
-        :param gamestring: Encodes the parameters of the game.
-        :type gamestring: str
+        :param gamestring: str; Encodes the parameters of the game.
         :return: A game with specified parameters, or None if gamestring lacks paramaters.
         :rtype: ConnectFourGame
         """
         tokens = gamestring.split(",")
-        if len(tokens) >= 8:
-            datetime_object = datetime.strptime(tokens[4], '%Y-%m-%d %H:%M:%S.%f')
-            game = ConnectFourGame(int(tokens[0]), tokens[1], tokens[2], int(tokens[3]),
-                                   datetime_object, tokens[5], int(tokens[6]), int(tokens[7]), int(tokens[8]))
-            return game
+        return ConnectFourGame(int(tokens[0]), tokens[1], int(tokens[2]),
+                               int(tokens[3]), int(tokens[4]))
 
     def game_to_string(self):
         """ Generate a single line string representation of the ConnectFourGame.
 
-        :return: a string representation of the ConnectFourGame.
-        :rtype: str
+        :return: str; a string representation of the ConnectFourGame.
         """
-        out = str(self.game_ID) + "," + self.user1 + "," + self.user2 + ","
-        out = out + str(self.last_tweet) + "," + str(self.last_active) + ","
-        for c in range(7):
-            for d in range(6):
-                out = out + str(self.get_val(c, d))
-        out = out + "," + str(self.num_turns) + "," + str(self.user1_is_playing) + "," + str(self.game_won)
-        return out
+        out = str(self.game_ID)
+        out = out + "," + self.board_to_string()
+        out = out + "," + str(self.num_turns)
+        out = out + "," + str(self.user1_is_playing)
+        return out + "," + str(self.game_won)
+
+    def get_unique_id(self):
+        """ Generate unique identifier for ConnectFourGame at current state of play.
+        """
+        return str(self.game_ID) + '_' + str(self.num_turns)
 
     def get_val(self, c, d):
         """ Get the value of a specific game board space.
 
-        :param c: The column being accessed. Zero-indexed.
-        :type c: int
-        :param d: The depth being accessed. Zero-indexed.
-        :type d: int
-        :return: The value of the game board space.
-        :rtype: int
+        :param c: int; The column being accessed. Zero-indexed.
+        :param d: int; The depth being accessed. Zero-indexed.
+        :return: int; The value of the game board space.
         """
         if (-1 < c < 7) & (-1 < d < 6):
             col = self.board[c]
@@ -125,64 +100,18 @@ class ConnectFourGame:
     def can_play(self, col):
         """ Check that game and column can be played on.
 
-        :param col: The column being accessed. 1-indexed.
-        :type col: int
-        :return: Whether user can play on this game in column.
-        :rtype: Boolean
+        :param col: int; The column being accessed. 1-indexed.
+        :return: bool; Whether user can play on this game in column.
         """
-        return self.game_won == 0 and self.num_turns < 42 \
-               and self.get_val(col-1, 0) == 0
+        return self.game_won == 0 and self.num_turns < 42 and self.get_val(col - 1, 0) == 0
 
-    def asemoji(self):
-        """ Output the game in an emojiful tweet-friendly representation.
-
-        :return: Tweetable representation of the board game.
-        :rtype: str
-        """
-        out = "@"
-        if self.user1_is_playing == 1:
-            out = out + self.user2
-        else:
-            out = out + self.user1
-
-        out = out + "\n"
-        if self.game_won:
-            out = out + "       GAME WON\n"
-        out = out + "\n"
-
-        for d in range(6):
-            for c in range(7):
-                x = self.get_val(c, d)
-                if x == 1:
-                    out = out + ":red_circle:"
-                if x == 2:
-                    out = out + ":blue_circle:"
-                if (x != 1) & (x != 2):
-                    out = out + ":white_circle:"
-            out = out + "\n"
-
-        out = out + "\n@" + self.user1 + "   :red_circle:"
-        if self.user1_is_playing == 1:
-            out = out + " :UP!_button:"
-
-        out = out + "\n" + "@" + self.user2 + "   :blue_circle:"
-        if self.user1_is_playing != 1:
-            out = out + " :UP!_button:"
-
-        return out
-
-    def play_turn(self, tweet_id, col):
+    def play_turn(self, col):
         """ Modify the ConnectFourGame to play a turn.
 
-        :param tweet_id: The ID of the tweet that made a play.
-        :type tweet_id: int
-        :param col: The column number to be played. 1-indexed.
-        :type col: int
+        :param col: int; The column number to be played. 1-indexed.
         :rtype: None
         """
         if self.can_play(col):
-            self.last_active = datetime.now()
-            self.last_tweet = tweet_id
 
             user = 2
             if self.user1_is_playing == 1:
@@ -191,11 +120,7 @@ class ConnectFourGame:
             self.place_piece(user, col)
             self.check_win()
 
-            if self.user1_is_playing == 1:
-                self.user1_is_playing = 0
-            else:
-                self.user1_is_playing = 1
-
+            self.user1_is_playing = abs(self.user1_is_playing - 1)
             self.num_turns += 1
 
     def place_piece(self, user, column):
@@ -215,9 +140,9 @@ class ConnectFourGame:
                 for i in range(5):  # max five sink actions
 
                     if col[piece_depth + 1] < 1:  # if space below empty,
-                        piece_depth += 1          # sink
+                        piece_depth += 1  # sink
 
-                col[piece_depth] = user     # place piece
+                col[piece_depth] = user  # place piece
 
     def check_win(self):
         """ Check to see if there are any lines of 4 pieces on the board.
